@@ -1,7 +1,7 @@
 "use strict";
 
-var Deck = require('../Deck');
-var cards = require('../cards');
+var Deck = require('../lib/Deck');
+var cards = require('../lib/cards');
 var Card = cards.Card;
 
 describe("A deck", function() {

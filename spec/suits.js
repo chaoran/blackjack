@@ -1,7 +1,7 @@
 "use strict";
 
-var colors = require('../colors');
-var suits = require('../suits');
+var colors = require('../lib/colors');
+var suits = require('../lib/suits');
 
 describe("Suits", function() {
   it("has 'Hearts'", function() {
