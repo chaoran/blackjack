@@ -2,6 +2,7 @@
 
 var suits = require('../suits');
 var cards = require('../cards');
+var Card = cards.Card;
 var names = [
   'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'
 ];
@@ -10,11 +11,9 @@ var suits = [
 ];
 
 describe("Cards", function() {
-  var Card;
   var table;
 
   beforeAll(function() {
-    Card = cards[0].constructor;
     table = Object.create(null);
 
     cards.forEach(function(card) {

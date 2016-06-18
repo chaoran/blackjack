@@ -33,3 +33,4 @@ for (var i = 0; i < CARD_NAMES.length; ++i) {
 }
 
 module.exports = cards;
+module.exports.Card = Card;
