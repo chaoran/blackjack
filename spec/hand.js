@@ -7,6 +7,7 @@ var SUITS = require('../lib/suits');
 describe("Hand", function() {
   var cardA = new Card(SUITS.SPADES, 'A');
   var card2 = new Card(SUITS.HEARTS, '2');
+  var card8 = new Card(SUITS.DIAMONDS, '8');
   var cardJ = new Card(SUITS.CLUBS, 'J');
 
   beforeEach(function() {
@@ -40,10 +41,9 @@ describe("Hand", function() {
       expect(this.hand.toString()).toBe('Soft 13');
     });
 
-    describe("After adding a '10' to a 'soft 13'", function() {
+    describe("After adding a 'J' to a 'soft 13'", function() {
       beforeEach(function() {
-        var card = new Card(SUITS.DIAMONDS, '10');
-        this.hand.add(card);
+        this.hand.add(cardJ);
       });
 
       it('has length 3', function() {
@@ -61,14 +61,27 @@ describe("Hand", function() {
 
       describe("After adding another 'A' to a hard '13'", function() {
         beforeEach(function() {
-          var card = new Card(SUITS.CLUBS, 'A');
-          this.hand.add(card);
+          this.hand.add(cardA);
         });
 
         it("is a 'hard 14'", function() {
           expect(this.hand.points).toBe(14);
           expect(this.hand.isSoft()).toBe(false);
         });
+      });
+    });
+
+    describe("After adding a '8' to a 'soft 13'", function() {
+      beforeEach(function() {
+        this.hand.add(card8);
+      });
+
+      it('is not a Blackjack', function() {
+        expect(this.hand.isBlackjack()).toBe(false);
+      });
+
+      it('stringifies to "Soft 21"', function() {
+        expect(this.hand.toString()).toBe('Soft 21');
       });
     });
   });
