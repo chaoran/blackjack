@@ -16,7 +16,7 @@ var jasmine = require('gulp-jasmine');
 gulp.task('test', [ 'jshint' ], function() {
   return gulp.src('spec/*.js').
     pipe(jasmine());
-})
+});
 
 gulp.task('default', [ 'jshint', 'test' ]);
 
