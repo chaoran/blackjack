@@ -40,11 +40,14 @@ Hand.prototype.isSoft = function() {
 };
 
 Hand.prototype.toString = function() {
-  var str = this.points.toString();
+  if (this.isBlackjack()) return 'Blackjack';
 
-  if (this.isSoft()) str = 'Soft ' + str;
+  var str = this.isSoft() ? 'Soft ' : '';
+  return str + this.points;
+};
 
-  return str;
+Hand.prototype.isBlackjack = function() {
+  return (this.points === 21 && this.length === 2);
 };
 
 module.exports = Hand;

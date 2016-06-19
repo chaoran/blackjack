@@ -7,6 +7,7 @@ var SUITS = require('../lib/suits');
 describe("Hand", function() {
   var cardA = new Card(SUITS.SPADES, 'A');
   var card2 = new Card(SUITS.HEARTS, '2');
+  var cardJ = new Card(SUITS.CLUBS, 'J');
 
   beforeEach(function() {
     this.hand = new Hand();
@@ -69,6 +70,25 @@ describe("Hand", function() {
           expect(this.hand.isSoft()).toBe(false);
         });
       });
+    });
+  });
+
+  describe('After adding an "A" and a "J"', function() {
+    beforeEach(function() {
+      this.hand.add(cardA);
+      this.hand.add(cardJ);
+    });
+
+    it('has 21 points', function() {
+      expect(this.hand.points).toBe(21);
+    });
+
+    it('is a Blackjack', function() {
+      expect(this.hand.isBlackjack()).toBe(true);
+    });
+
+    it('stringifies to Blackjack', function() {
+      expect(this.hand.toString()).toBe('Blackjack');
     });
   });
 });
