@@ -1,53 +1,119 @@
 "use strict";
+function Hand(wager) {
+  var hidden;
 
-function Hand() {
-  this.points = 0;
-  this._nAces = 0;
+  this.hide = function(card) {
+    hidden = card;
+  };
+
+  this.reveal = function() {
+    if (hidden !== undefined) {
+      this.deal(hidden);
+      hidden = undefined;
+    }
+  };
+
+  this.cards = [];
+  this.wager = wager;
 }
 
-Hand.prototype = Object.create(Array.prototype);
+Hand.prototype._eval = function() {
+  var point = 0;
+  var nAces = 0;
 
-Hand.prototype.add = function(card) {
-  this.push(card);
+  for (var i = 0; i < this.cards.length; ++i) {
+    var card = this.cards[i];
 
-  switch (card.name) {
-    case 'A': {
-      this.points += 11;
-      this._nAces += 1; break;
+    switch (card.name) {
+      case 'A': {
+        point += 11;
+        nAces += 1; break;
+      }
+      case '2': point += 2; break;
+      case '3': point += 3; break;
+      case '4': point += 4; break;
+      case '5': point += 5; break;
+      case '6': point += 6; break;
+      case '7': point += 7; break;
+      case '8': point += 8; break;
+      case '9': point += 9; break;
+      case '10': point += 10; break;
+      case 'J': point += 10; break;
+      case 'Q': point += 10; break;
+      case 'K': point += 10; break;
+      default:
+        throw new Error("Unknown card: " + card);
     }
-    case '2': this.points += 2; break;
-    case '3': this.points += 3; break;
-    case '4': this.points += 4; break;
-    case '5': this.points += 5; break;
-    case '6': this.points += 6; break;
-    case '7': this.points += 7; break;
-    case '8': this.points += 8; break;
-    case '9': this.points += 9; break;
-    case '10': this.points += 10; break;
-    case 'J': this.points += 10; break;
-    case 'Q': this.points += 10; break;
-    case 'K': this.points += 10; break;
-    default:
-      throw new Error("Unknown card: " + card);
+
+    while (point > 21 && nAces-- > 0) point -= 10;
   }
 
-  while (this.points > 21 && this._nAces-- > 0)
-    this.points -= 10;
+  this.point = point;
+  this.soft = (nAces > 0);
+  this.blackjack = (this.cards.length === 2 && point === 21);
+  this.busted = (point > 21);
 };
 
-Hand.prototype.isSoft = function() {
-  return (this._nAces > 0);
+/**
+ * Make 'point', 'soft', 'blackjack', 'busted' lazily calculated
+ * properties.
+ */
+function lazyEval(property) {
+  return {
+    configurable: true,
+    enumerable: true,
+    get: function() {
+      this._eval();
+      return this[property];
+    },
+    set: function(value) {
+      Object.defineProperty(this, property, {
+        value: value,
+        configurable: true,
+        enumerable: true,
+        writable: false
+      });
+    }
+  };
+}
+
+Object.defineProperties(Hand.prototype, {
+  point: lazyEval('point'),
+  soft: lazyEval('soft'),
+  blackjack: lazyEval('blackjack'),
+  busted: lazyEval('busted')
+});
+
+Hand.prototype._reset = function() {
+  delete this.point;
+  delete this.soft;
+  delete this.blackjack;
+  delete this.busted;
+};
+
+/** Push and pop will reset previously calculated properties. */
+Hand.prototype.deal = function(card) {
+  this._reset();
+  this.cards.push(card);
+};
+
+Hand.prototype.split = function() {
+  /** Pop the last card from this hand. */
+  var card = this.cards.pop();
+  this._reset();
+
+  /** Create a new hand. */
+  var hand = new Hand(this.wager);
+  hand.deal(card);
+  return hand;
 };
 
 Hand.prototype.toString = function() {
-  if (this.isBlackjack()) return 'Blackjack';
+  if (this.blackjack) return 'Blackjack';
+  if (this.busted) return 'Busted';
 
-  var str = this.isSoft() ? 'Soft ' : '';
-  return str + this.points;
-};
-
-Hand.prototype.isBlackjack = function() {
-  return (this.points === 21 && this.length === 2);
+  var type = this.soft ? 'Soft ' : '';
+  return type + this.point;
 };
 
 module.exports = Hand;
