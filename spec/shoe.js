@@ -1,6 +1,6 @@
 "use strict";
 
-var Shoe = require('../Shoe');
+var Shoe = require('../shoe');
 var EventEmitter = require('events');
 
 describe("Shoe", function() {
