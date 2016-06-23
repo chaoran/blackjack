@@ -2,7 +2,7 @@
 var Deck = require('./lib/Deck');
 var allCards = require('./lib/cards');
 
-function Shoe(options) {
+function Shoe(game, options) {
   var nOfDecks = options.nOfDecks || 8;
   var cards = [];
 
@@ -12,16 +12,22 @@ function Shoe(options) {
     cards = cards.concat(deck);
   }
 
-  var penetration = options.penetration || 0.5;
-  this._limit = Math.floor(penetration * cards.length);
-
   Deck.call(this, cards);
+
+  if (game) {
+    var penetration = options.penetration || 0.5;
+    var limit = Math.floor(penetration * cards.length);
+    var that = this;
+
+    game.on('start', function() {
+      if (that._next >= limit) that.shuffle();
+    });
+  }
 }
 
 Shoe.prototype = Object.create(Deck.prototype);
 
 Shoe.prototype.draw = function() {
-  if (this._next >= this._limit) this.shuffle();
   Deck.prototype.draw.call(this);
 };
 
