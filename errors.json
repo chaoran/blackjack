@@ -1,0 +1,6 @@
+{
+  "bank": {
+    "IF": { "name": "Insufficient Funds" },
+    "BO": { "name": "Balance Overflow" }
+  }
+}
