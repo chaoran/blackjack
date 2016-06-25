@@ -1,14 +1,13 @@
 "use strict";
 
 var Shoe = require('../shoe');
-var EventEmitter = require('events');
 
 describe("Shoe", function() {
   describe("When initialized with options.nOfDecks > 0", function() {
     var testNumOfDecks = 4;
 
     beforeEach(function() {
-      this.shoe = new Shoe(null, { nOfDecks: testNumOfDecks });
+      this.shoe = new Shoe({ nOfDecks: testNumOfDecks });
     });
 
     it("should contain the specified number of deck", function() {
@@ -18,11 +17,10 @@ describe("Shoe", function() {
 
   describe("When initialized with options.penetration > 0", function() {
     var options = { nOfDecks: 1, penetration: 0.1 };
-    var shoe, emitter;
+    var shoe;
 
     beforeAll(function() {
-      emitter = new EventEmitter();
-      shoe = new Shoe(emitter, options);
+      shoe = new Shoe(options);
     });
 
     describe("before reaching penetration depth", function() {
@@ -39,7 +37,7 @@ describe("Shoe", function() {
     });
 
     describe("when reaching penetration depth", function() {
-      describe("if game is not over yet", function() {
+      describe("if shuffle is not called", function() {
         it("should not shuffle", function() {
           var left = shoe.left();
           shoe.draw();
@@ -48,9 +46,9 @@ describe("Shoe", function() {
         });
       });
 
-      describe('if game emit "start"', function() {
+      describe('if shuffle is called', function() {
         it("should shuffle", function() {
-          emitter.emit("start");
+          shoe.shuffle();
           shoe.draw();
           expect(shoe.left()).toBe(shoe.total() - 1);
         });
