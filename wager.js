@@ -5,15 +5,25 @@ function Wager(bank, amount) {
     Wager.create(bank, amount, done);
   };
 
-  this.double = function(done) {
-    bank.withdraw(amount, function(err) {
+  this.double = function(source, done) {
+    if (arguments.length === 1) {
+      done = source;
+      source = bank;
+    }
+
+    source.withdraw(amount, function(err) {
       if (!err) amount += amount;
       done(err);
     });
   };
 
-  this.claim = function(bank, done) {
-    bank.deposit(amount, function(err) {
+  this.claim = function(dest, done) {
+    if (arguments.length === 1) {
+      done = dest;
+      dest = bank;
+    }
+
+    dest.deposit(amount, function(err) {
       if (!err) amount = 0;
       done(err);
     });

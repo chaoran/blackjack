@@ -67,7 +67,7 @@ describe('Wager', function() {
 
     it('should deposit the wager into a bank', function(done) {
       checkBalance(bank, 5, function() {
-        wager.claim(bank, function(err) {
+        wager.claim(function(err) {
           expect(err).toBeFalsy();
           checkBalance(bank, 10, done);
         });
@@ -101,6 +101,24 @@ describe('Wager', function() {
           wager.double(function(err) {
             expect(err).toBeFalsy();
             checkBalance(bank, 0, function() {
+              checkWager(wager, 10, done);
+            });
+          });
+        });
+      });
+
+      describe('when using a different bank', function() {
+        var anotherBank;
+
+        beforeEach(function(done) {
+          anotherBank = new Bank();
+          anotherBank.deposit(10, done);
+        });
+
+        it('should take money form the given bank', function(done) {
+          wager.double(anotherBank, function(err) {
+            expect(err).toBeFalsy();
+            checkBalance(anotherBank, 5, function() {
               checkWager(wager, 10, done);
             });
           });
