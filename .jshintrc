@@ -1,5 +1,6 @@
 {
   "node": true,
+  "esversion": 6,
   "strict": true,
   "undef": true,
   "jasmine": true
