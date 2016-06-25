@@ -16,8 +16,8 @@ describe("Hand", function() {
 
   describe("After adding an 'A' and a '2' into a hand", function() {
     beforeEach(function() {
-      this.hand.deal(cardA);
-      this.hand.deal(card2);
+      this.hand.push(cardA);
+      this.hand.push(card2);
     });
 
     it("has 'A' at position '0' and '2' at position '1'", function() {
@@ -43,7 +43,7 @@ describe("Hand", function() {
 
     describe("After adding a 'J' to a 'soft 13'", function() {
       beforeEach(function() {
-        this.hand.deal(cardJ);
+        this.hand.push(cardJ);
       });
 
       it('has length 3', function() {
@@ -62,7 +62,7 @@ describe("Hand", function() {
       describe("After adding another 'A' to a hard '13'", function() {
         it("is a 'hard 14'", function() {
           expect(this.hand.point).toBe(13);
-          this.hand.deal(cardA);
+          this.hand.push(cardA);
           expect(this.hand.point).toBe(14);
           expect(this.hand.soft).toBe(false);
         });
@@ -71,7 +71,7 @@ describe("Hand", function() {
       describe('After adding a "J" to a hard "13"', function() {
         it('is busted', function() {
           expect(this.hand.busted).toBe(false);
-          this.hand.deal(cardJ);
+          this.hand.push(cardJ);
           expect(this.hand.busted).toBe(true);
         });
       });
@@ -79,7 +79,7 @@ describe("Hand", function() {
 
     describe("After adding a '8' to a 'soft 13'", function() {
       beforeEach(function() {
-        this.hand.deal(card8);
+        this.hand.push(card8);
       });
 
       it('is not a Blackjack', function() {
@@ -94,8 +94,8 @@ describe("Hand", function() {
 
   describe('After adding an "A" and a "J"', function() {
     beforeEach(function() {
-      this.hand.deal(cardA);
-      this.hand.deal(cardJ);
+      this.hand.push(cardA);
+      this.hand.push(cardJ);
     });
 
     it('has 21 points', function() {
@@ -113,7 +113,7 @@ describe("Hand", function() {
 
   describe("When dealt a hidden card", function() {
     beforeEach(function() {
-      this.hand.deal(cardJ);
+      this.hand.push(cardJ);
       this.hand.hide(cardA);
     });
 

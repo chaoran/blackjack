@@ -1,5 +1,8 @@
 "use strict";
-function Hand(wager) {
+
+var EventEmitter = require('events');
+
+function Hand() {
   var hidden;
 
   this.hide = function(card) {
@@ -8,14 +11,18 @@ function Hand(wager) {
 
   this.reveal = function() {
     if (hidden !== undefined) {
-      this.deal(hidden);
+      this.push(hidden);
       hidden = undefined;
     }
   };
 
   this.cards = [];
-  this.wager = wager;
+  EventEmitter.call(this);
 }
+
+Hand.prototype = Object.create(EventEmitter.prototype, {
+  constructor: Hand
+});
 
 Hand.prototype._eval = function() {
   var point = 0;
@@ -92,20 +99,14 @@ Hand.prototype._reset = function() {
 };
 
 /** Push and pop will reset previously calculated properties. */
-Hand.prototype.deal = function(card) {
+Hand.prototype.push = function(card) {
   this._reset();
   this.cards.push(card);
 };
 
-Hand.prototype.split = function() {
-  /** Pop the last card from this hand. */
-  var card = this.cards.pop();
+Hand.prototype.take = function() {
   this._reset();
-
-  /** Create a new hand. */
-  var hand = new Hand(this.wager);
-  hand.deal(card);
-  return hand;
+  return this.cards.pop();
 };
 
 Hand.prototype.toString = function() {
