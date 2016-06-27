@@ -24,7 +24,7 @@ function Driver(house, bank, options) {
   var that = this;
 
   this.player.on('next', function(hand, against, actions) {
-    console.log('[' + hand + '] against [' + against + ']');
+    console.log('[' + hand + '] vs. [' + against + ']');
 
     var question = '';
 
@@ -51,23 +51,21 @@ function Driver(house, bank, options) {
     rl.question(question, response);
   });
 
-  this.player.on('win', function(hand, dealerHand) {
+  var print = function(result, hand, dealerHand) {
     console.log(
-      '[' + hand + ' (' + hand.name + ')] win [' +
-      dealerHand + ' (' + dealerHand.name +')]'
+      '[ %s ](%s) %s [ %s ](%s)', hand, hand.name, result,
+      dealerHand, dealerHand.name
     );
+  };
+
+  this.player.on('win', function(hand, dealerHand) {
+    print('win', hand, dealerHand);
   });
   this.player.on('lose', function(hand, dealerHand) {
-    console.log(
-      '[' + hand + ' (' + hand.name + ')] lose [' +
-      dealerHand + ' (' + dealerHand.name +')]'
-    );
+    print('lose', hand, dealerHand);
   });
   this.player.on('push', function(hand, dealerHand) {
-    console.log(
-      '[' + hand + ' (' + hand.name + ')] win [' +
-      dealerHand + ' (' + dealerHand.name +')]'
-    );
+    print('push', hand, dealerHand);
   });
   this.blackjack.on('end', () => {
     this.start();
@@ -87,7 +85,7 @@ Driver.prototype.start = function() {
     rl.question(question, (input) => {
       if (input === 'e') return process.exit();
 
-      if (input !== '') {
+      if (input !== '' || input === '' && !this.bet) {
         var bet = parseInt(input);
         if (isNaN(bet)) {
           console.log('Invalid number: ' + input);
