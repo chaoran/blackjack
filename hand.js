@@ -110,11 +110,19 @@ Hand.prototype.take = function() {
 };
 
 Hand.prototype.toString = function() {
-  if (this.blackjack) return 'Blackjack';
-  if (this.busted) return 'Busted';
-
-  var type = this.soft ? 'Soft ' : '';
-  return type + this.point;
+  return this.cards.map(function(card) {
+    return card.suit + card.name;
+  }).join(', ');
 };
+
+Object.defineProperty(Hand.prototype, 'name', {
+  enumerable: true,
+  configurable: true,
+  get: function() {
+    if (this.blackjack) return 'Blackjack';
+    else if (this.busted) return 'Busted';
+    else return this.soft ? 'Soft ' + this.point : '' + this.point;
+  }
+});
 
 module.exports = Hand;
