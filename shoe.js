@@ -3,7 +3,8 @@ var Deck = require('./lib/Deck');
 var allCards = require('./lib/cards');
 
 function Shoe(options) {
-  var nOfDecks = options.nOfDecks || 8;
+  options = options || {};
+  var nOfDecks = options.nOfDecks || 1;
   var cards = [];
 
   for (var i = 0; i < nOfDecks; ++i) {
@@ -21,7 +22,7 @@ function Shoe(options) {
 Shoe.prototype = Object.create(Deck.prototype);
 
 Shoe.prototype.draw = function() {
-  Deck.prototype.draw.call(this);
+  return Deck.prototype.draw.call(this);
 };
 
 Shoe.prototype.shuffle = function() {

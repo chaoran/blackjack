@@ -1,6 +1,7 @@
 "use strict";
 
 var Shoe = require('../shoe');
+var Card = require('../lib/cards').Card;
 
 describe("Shoe", function() {
   describe("When initialized with options.nOfDecks > 0", function() {
@@ -12,6 +13,10 @@ describe("Shoe", function() {
 
     it("should contain the specified number of deck", function() {
       expect(this.shoe.total()).toBe(52 * testNumOfDecks);
+    });
+
+    it('should draw a card if #draw() is called', function() {
+      expect(this.shoe.draw()).toEqual(jasmine.any(Card));
     });
   });
 
