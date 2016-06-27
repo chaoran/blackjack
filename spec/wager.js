@@ -2,7 +2,7 @@
 
 var Wager = require('../wager');
 var Bank = require('../bank');
-var errors = require('../errors').bank;
+var errors = require('../errors');
 
 describe('Wager', function() {
   var wager, bank;
@@ -32,7 +32,7 @@ describe('Wager', function() {
   }
 
   beforeAll(function() {
-    expect(errors.IF).toBeTruthy();
+    expect(errors.bank.IF).toBeTruthy();
   });
 
   beforeEach(function(done) {
@@ -50,9 +50,9 @@ describe('Wager', function() {
       });
     });
 
-    it('should emit an errors.IF if not enough funds', function(done) {
+    it('should emit an errors.bank.IF if not enough funds', function(done) {
       Wager.create(bank, 15, function(err, wager) {
-        expect(err).toBe(errors.IF);
+        expect(err).toBe(errors.bank.IF);
         expect(wager).toBe(null);
 
         checkBalance(bank, 10, done);
@@ -85,6 +85,20 @@ describe('Wager', function() {
         wager.claim(anotherBank, function(err) {
           expect(err).toBeFalsy();
           checkBalance(bank, 5, done);
+        });
+      });
+    });
+
+    describe('if claim again', function() {
+      beforeEach(function(done) {
+        wager.claim(done);
+      });
+
+      it('should emit errors.wager.AC', function(done) {
+        wager.claim(function(err) {
+          expect(err).toBeDefined();
+          expect(err).toBe(errors.wager.AC);
+          done();
         });
       });
     });
@@ -131,10 +145,10 @@ describe('Wager', function() {
         createWager(bank, 6, done);
       });
 
-      it('should emit errors.IF', function(done) {
+      it('should emit errors.bank.IF', function(done) {
         checkBalance(bank, 4, function() {
           wager.double(function(err) {
-            expect(err).toBe(errors.IF);
+            expect(err).toBe(errors.bank.IF);
             checkBalance(bank, 4, function() {
               checkWager(wager, 6, done);
             });
@@ -167,10 +181,10 @@ describe('Wager', function() {
         createWager(bank, 6, done);
       });
 
-      it('should emit errors.IF', function(done) {
+      it('should emit errors.bank.IF', function(done) {
         checkBalance(bank, 4, function() {
           wager.split(function(err, newWager) {
-            expect(err).toBe(errors.IF);
+            expect(err).toBe(errors.bank.IF);
             expect(newWager).toBe(null);
             checkBalance(bank, 4, done);
           });

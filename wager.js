@@ -1,5 +1,7 @@
 "use strict";
 
+var errors = require('./errors').wager;
+
 function Wager(bank, amount) {
   this.split = function(done) {
     Wager.create(bank, amount, done);
@@ -22,6 +24,8 @@ function Wager(bank, amount) {
       done = dest;
       dest = bank;
     }
+
+    if (amount === 0) return done(errors.AC);
 
     dest.deposit(amount, function(err) {
       if (!err) amount = 0;
