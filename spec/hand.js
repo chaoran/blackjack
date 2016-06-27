@@ -37,8 +37,8 @@ describe("Hand", function() {
       expect(this.hand.soft).toBe(true);
     });
 
-    it("stringifies to 'Soft 13'", function() {
-      expect(this.hand.toString()).toBe('Soft 13');
+    it("should have name 'Soft 13'", function() {
+      expect(this.hand.name).toBe('Soft 13');
     });
 
     describe("After adding a 'J' to a 'soft 13'", function() {
@@ -55,8 +55,8 @@ describe("Hand", function() {
         expect(this.hand.soft).toBe(false);
       });
 
-      it('stringifies to "13"', function() {
-        expect(this.hand.toString()).toBe('13');
+      it('should have name "13"', function() {
+        expect(this.hand.name).toBe('13');
       });
 
       describe("After adding another 'A' to a hard '13'", function() {
@@ -86,8 +86,8 @@ describe("Hand", function() {
         expect(this.hand.blackjack).toBe(false);
       });
 
-      it('stringifies to "Soft 21"', function() {
-        expect(this.hand.toString()).toBe('Soft 21');
+      it('should have name "Soft 21"', function() {
+        expect(this.hand.name).toBe('Soft 21');
       });
     });
   });
@@ -106,8 +106,8 @@ describe("Hand", function() {
       expect(this.hand.blackjack).toBe(true);
     });
 
-    it('stringifies to Blackjack', function() {
-      expect(this.hand.toString()).toBe('Blackjack');
+    it('should have name Blackjack', function() {
+      expect(this.hand.name).toBe('Blackjack');
     });
   });
 
