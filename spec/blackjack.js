@@ -52,14 +52,10 @@ describe('Blackjack', function() {
         hand = blackjack.play(wager);
       });
 
-      it('should not emit "next"', function(done) {
+      it('should not emit "next" but "win"', function(done) {
         hand.on('next', function() {
           done.fail('emitted "next"');
         });
-        hand.on('end', done);
-      });
-
-      it('should emit "win"', function(done) {
         hand.on('win', done);
       });
     });
@@ -123,17 +119,9 @@ describe('Blackjack', function() {
             hand.once('next', function() {
               done.fail('emitted "next"');
             });
-            hand.once('lose', done);
-          });
-
-          it('should "bust" and lose money', function(done) {
-            hand.once('end', function() {
+            hand.once('lose', function() {
               expect(this.busted).toBe(true);
-              wager.claim(playerBank, function(err) {
-                expect(err).toBeDefined();
-                expect(err).toBe(errors.wager.AC);
-                done();
-              });
+              done();
             });
           });
         });
@@ -151,23 +139,9 @@ describe('Blackjack', function() {
           hand.once('next', function() {
             done.fail('emitted "next"');
           });
-          hand.once('lose', done);
-        });
-
-        it('should deal another card', function(done) {
-          hand.once('end', function() {
+          hand.once('lose', function() {
             expect(hand.cards.length).toBe(3);
             done();
-          });
-        });
-
-        it('should lose his wager', function(done) {
-          hand.once('end', function() {
-            wager.claim(playerBank, function(err) {
-              expect(err).toBeDefined();
-              expect(err).toBe(errors.wager.AC);
-              done();
-            });
           });
         });
       });
@@ -271,28 +245,12 @@ describe('Blackjack', function() {
               });
             });
 
-            it('should claim 40 from first hand', function(done) {
-              hand.once('end', function() {
-                wager.claim(function(err) {
+            it('should claim 30 from first hand', function(done) {
+              blackjack.once('end', function() {
+                playerBank.inquire(function(err, balance) {
                   expect(err).toBeFalsy();
-                  playerBank.inquire(function(err, balance) {
-                    expect(err).toBeFalsy();
-                    expect(balance).toBe(20);
-                    done();
-                  });
-                });
-              });
-            });
-
-            it('should claim 10 from second hand', function(done) {
-              hand2.once('end', function() {
-                wager2.claim(function(err) {
-                  expect(err).toBeFalsy();
-                  playerBank.inquire(function(err, balance) {
-                    expect(err).toBeFalsy();
-                    expect(balance).toBe(10);
-                    done();
-                  });
+                  expect(balance).toBe(30);
+                  done();
                 });
               });
             });

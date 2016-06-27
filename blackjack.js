@@ -1,30 +1,54 @@
 "use strict";
 var Hand = require('./hand');
+var EventEmitter = require('events');
 
 function Blackjack(bank, dealer, options) {
-  this._dealer = dealer;
-  this._createHand = (wager) => {
-    var hand = new Hand();
-    var done = function() { hand.emit('end'); };
+  EventEmitter.call(this);
 
-    hand.once('win', () => { wager.double(bank, done); });
-    hand.once('lose', () => { wager.claim(bank, done); });
-    hand.once('push', done);
+  options = options || {};
+  this._dealer = dealer;
+
+  var nHands = 0;
+  this._createHand = (wager) => {
+    nHands++;
+
+    var hand = new Hand();
+    var done = () => {
+      if (--nHands === 0) process.nextTick(() => {
+        this.emit('end');
+      });
+    };
+
+    hand.once('win', () => {
+      var rate = hand.blackjack ? options.blackjackPay || 1.5 : 1;
+      wager.pay(rate, bank, done);
+    });
+
+    hand.once('lose', () => {
+      wager.pay(bank, done);
+    });
+
+    hand.once('push', () => {
+      wager.pay(done);
+    });
 
     return hand;
   };
 
-  this._queue = [];
-  this._stand = [];
-
-  options = options || {};
   this._allowDouble = options.allowDouble || true;
   this._allowSplit = options.allowSplit || true;
 }
 
+Blackjack.prototype = Object.create(EventEmitter.prototype, {
+  constructor: Blackjack
+});
+
 Blackjack.prototype.play = function(wager) {
   var dealerHand = new Hand();
   var playerHand = this._createHand(wager);
+
+  this._queue = [];
+  this._stand = [];
 
   this._dealer.deal(dealerHand, playerHand);
 
@@ -39,7 +63,7 @@ Blackjack.prototype._next = function(hand) {
     this._dealer.show(this._stand);
   });
 
-  if (hand.busted || hand.blackjack) {
+  if (hand.point >= 21) {
     this._stand.push(hand);
     return this._next();
   }
