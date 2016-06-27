@@ -13,46 +13,39 @@ Dealer.prototype.deal = function(dealerHand, playerHand) {
   dealerHand.push(this._shoe.draw());
   playerHand.push(this._shoe.draw());
   dealerHand.hide(this._shoe.draw());
-
-  if (playerHand.blackjack) {
-    this.show(playerHand);
-    return null;
-  } else {
-    return playerHand;
-  }
 };
 
 Dealer.prototype.serve = function(...hands) {
-  return hands.map((hand) => {
-      hand.push(this._shoe.draw());
-      return hand.point >= 21 ? this.show(hand) : hand;
-  });
+  for (let hand of hands)
+    hand.push(this._shoe.draw());
 };
 
-Dealer.prototype.show = function(hand) {
+Dealer.prototype.show = function(hands) {
   this.hand.reveal();
 
-  if (hand.busted) {
-    hand.emit('lose');
-    return;
-  }
+  for (let hand of hands) {
+    if (hand.busted) {
+      hand.emit(this.hand.busted ? 'push' : 'lose', this.hand);
+      continue;
+    }
 
-  if (hand.blackjack) {
-    hand.emit(this.hand.blackjack ? 'push' : 'win');
-    return;
-  }
+    if (hand.blackjack) {
+      hand.emit(this.hand.blackjack ? 'push' : 'win', this.hand);
+      continue;
+    }
 
-  while (this.hand.point < 17 ||
-         this._hit17 && this.hand.soft && this.hand.point === 17) {
-    this.hand.push(this._shoe.draw());
-  }
+    while (this.hand.point < 17 ||
+           this._hit17 && this.hand.soft && this.hand.point === 17) {
+      this.hand.push(this._shoe.draw());
+    }
 
-  if (hand.point === this.hand.point) {
-    hand.emit('push');
-  } else if (hand.point < this.hand.point) {
-    hand.emit('lose');
-  } else {
-    hand.emit('win');
+    if (this.hand.busted || hand.point > this.hand.point) {
+      hand.emit('win', this.hand);
+    } else if (hand.point === this.hand.point) {
+      hand.emit('push', this.hand);
+    } else if (hand.point < this.hand.point) {
+      hand.emit('lose', this.hand);
+    }
   }
 };
 

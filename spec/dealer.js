@@ -32,18 +32,6 @@ describe('Dealer', () => {
       expect(dealerHand.push).toHaveBeenCalledTimes(1);
       expect(dealerHand.hide).toHaveBeenCalledTimes(1);
     });
-
-    it('does not call #show() if playerHand is not blackjack', () => {
-      expect(dealer.show).not.toHaveBeenCalledWith(playerHand);
-      expect(hand).toBe(playerHand);
-    });
-
-    it('calls #show() if playerHand is blackjack', () => {
-      playerHand.blackjack = true;
-      var hand = dealer.deal(dealerHand, playerHand);
-      expect(dealer.show).toHaveBeenCalledWith(playerHand);
-      expect(hand).toBe(null);
-    });
   });
 
   describe('#serve()', () => {
@@ -65,18 +53,6 @@ describe('Dealer', () => {
       expect(hand1.push).toHaveBeenCalledTimes(1);
       expect(hand2.push).toHaveBeenCalledTimes(1);
     });
-
-    it('should not return a hand that has >= 21 point', function() {
-      var [ newHand1, newHand2 ] = dealer.serve(hand1, hand2);
-      expect(newHand1).toBeFalsy();
-      expect(newHand2).toBe(hand2);
-    });
-
-    it('should call #show() on hands that have >= 21 point', function() {
-      dealer.serve(hand1, hand2);
-      expect(dealer.show).toHaveBeenCalledTimes(1);
-      expect(dealer.show).toHaveBeenCalledWith(hand1);
-    });
   });
 
   describe('#show()', () => {
@@ -97,50 +73,50 @@ describe('Dealer', () => {
     });
 
     it("should call reveal on dealer's hand", () => {
-      dealer.show(hand);
+      dealer.show([ hand ]);
       expect(dealer.hand.reveal).toHaveBeenCalledTimes(1);
     });
 
     it('should emit "win" if player is blackjack and dealer is not', () => {
       hand.blackjack = true;
-      dealer.show(hand);
-      expect(hand.emit).toHaveBeenCalledWith('win');
+      dealer.show([ hand ]);
+      expect(hand.emit).toHaveBeenCalledWith('win', dealer.hand);
     });
 
     it('should emit "push" if both player and dealer has blackjack', () => {
       hand.blackjack = true;
       dealer.hand.blackjack = true;
-      dealer.show(hand);
-      expect(hand.emit).toHaveBeenCalledWith('push');
+      dealer.show([ hand ]);
+      expect(hand.emit).toHaveBeenCalledWith('push', dealer.hand);
     });
 
     it('should emit "lose" if player is busted', () => {
       hand.busted = true;
-      dealer.show(hand);
-      expect(hand.emit).toHaveBeenCalledWith('lose');
+      dealer.show([ hand ]);
+      expect(hand.emit).toHaveBeenCalledWith('lose', dealer.hand);
     });
 
     it('should keep drawing the dealerHand until it reaches 18', () => {
-      dealer.show(hand);
+      dealer.show([ hand ]);
       expect(dealer.hand.point).toBe(17);
     });
 
     it('should emit "win" if player has more point', () => {
       hand.point = 20;
-      dealer.show(hand);
-      expect(hand.emit).toHaveBeenCalledWith('win');
+      dealer.show([ hand ]);
+      expect(hand.emit).toHaveBeenCalledWith('win', dealer.hand);
     });
 
     it('should emit "lose" if player has less point', () => {
       hand.point = 16;
-      dealer.show(hand);
-      expect(hand.emit).toHaveBeenCalledWith('lose');
+      dealer.show([ hand ]);
+      expect(hand.emit).toHaveBeenCalledWith('lose', dealer.hand);
     });
 
     it('should emit "push" if player has less point', () => {
       hand.point = 17;
-      dealer.show(hand);
-      expect(hand.emit).toHaveBeenCalledWith('push');
+      dealer.show([ hand ]);
+      expect(hand.emit).toHaveBeenCalledWith('push', dealer.hand);
     });
   });
 });
