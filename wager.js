@@ -7,30 +7,52 @@ function Wager(bank, amount) {
     Wager.create(bank, amount, done);
   };
 
-  this.double = function(source, done) {
+  this.double = function(dry, done) {
     if (arguments.length === 1) {
-      done = source;
-      source = bank;
+      done = dry;
+      dry = false;
     }
 
-    source.withdraw(amount, function(err) {
-      if (!err) amount += amount;
-      done(err);
-    });
+    if (dry) {
+      bank.inquire(function(err, balance) {
+        done(err, balance >= amount);
+      });
+    } else {
+      bank.withdraw(amount, function(err) {
+        if (!err) amount += amount;
+        done(err);
+      });
+    }
   };
 
-  this.claim = function(dest, done) {
-    if (arguments.length === 1) {
-      done = dest;
-      dest = bank;
+  this.pay = (...args) => {
+    switch (args.length) {
+      case 1: {
+        let [ done ] = args;
+        this.pay(bank, done);
+        break;
+      }
+      case 2: {
+        let [ dest, done ] = args;
+        dest.deposit(amount, function(err) {
+          if (!err) amount = 0;
+          done(err);
+        });
+        break;
+      }
+      case 3: {
+        let [ rate, src, done ] = args;
+        src.withdraw(rate * amount, (err) => {
+          if (err) return done(err);
+          amount += rate * amount;
+          this.pay(bank, done);
+        });
+        break;
+      }
+      default:
+        throw new Error("expects 1-3 arguments but receives " +
+                        args.length);
     }
-
-    if (amount === 0) return done(errors.AC);
-
-    dest.deposit(amount, function(err) {
-      if (!err) amount = 0;
-      done(err);
-    });
   };
 }
 

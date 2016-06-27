@@ -25,7 +25,7 @@ describe('Wager', function() {
   function checkWager(wager, amount, done) {
     var emptyBank = new Bank();
 
-    wager.claim(emptyBank, function(err) {
+    wager.pay(emptyBank, function(err) {
       expect(err).toBeFalsy();
       checkBalance(emptyBank, amount, done);
     });
@@ -60,45 +60,53 @@ describe('Wager', function() {
     });
   });
 
-  describe('#claim()', function() {
+  describe('#pay()', function() {
     beforeEach(function(done) {
       createWager(bank, 5, done);
     });
 
-    it('should deposit the wager into a bank', function(done) {
-      checkBalance(bank, 5, function() {
-        wager.claim(function(err) {
-          expect(err).toBeFalsy();
-          checkBalance(bank, 10, done);
+    describe('given only one argument', function() {
+      it('should deposit the wager back', function(done) {
+        checkBalance(bank, 5, function() {
+          wager.pay(function(err) {
+            expect(err).toBeFalsy();
+            checkBalance(bank, 10, done);
+          });
         });
       });
     });
 
-    describe('given a different bank', function() {
+    describe('given two arguments', function() {
       var anotherBank;
 
       beforeEach(function() {
         anotherBank = new Bank();
       });
 
-      it('should deposit into the different bank', function(done) {
-        wager.claim(anotherBank, function(err) {
+      it('should deposit into the given bank', function(done) {
+        wager.pay(anotherBank, function(err) {
           expect(err).toBeFalsy();
           checkBalance(bank, 5, done);
         });
       });
     });
 
-    describe('if claim again', function() {
+    describe('given three argument', function() {
+      var anotherBank;
+
       beforeEach(function(done) {
-        wager.claim(done);
+        anotherBank = new Bank();
+        anotherBank.deposit(10, done);
       });
 
-      it('should emit errors.wager.AC', function(done) {
-        wager.claim(function(err) {
-          expect(err).toBeDefined();
-          expect(err).toBe(errors.wager.AC);
-          done();
+      it('should withdraw from the given bank then deposit', function(done) {
+        wager.pay(1, anotherBank, function(err) {
+          expect(err).toBeFalsy();
+          checkBalance(anotherBank, 5, function() {
+            checkBalance(bank, 15, function() {
+              checkWager(wager, 0, done);
+            });
+          });
         });
       });
     });
@@ -115,24 +123,6 @@ describe('Wager', function() {
           wager.double(function(err) {
             expect(err).toBeFalsy();
             checkBalance(bank, 0, function() {
-              checkWager(wager, 10, done);
-            });
-          });
-        });
-      });
-
-      describe('when using a different bank', function() {
-        var anotherBank;
-
-        beforeEach(function(done) {
-          anotherBank = new Bank();
-          anotherBank.deposit(10, done);
-        });
-
-        it('should take money form the given bank', function(done) {
-          wager.double(anotherBank, function(err) {
-            expect(err).toBeFalsy();
-            checkBalance(anotherBank, 5, function() {
               checkWager(wager, 10, done);
             });
           });
